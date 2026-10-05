@@ -1,0 +1,6 @@
+{
+  "name": "Thakur Interior",
+  "description": "Thakur Interior offers thoughtful residential interiors, modular kitchens, wardrobes and commercial interior design in Jabalpur, Madhya Pradesh.",
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"],
+  "permissions": []
+}

@@ -17,9 +17,10 @@ const demoMedia = {
   cta: "https://images.pexels.com/photos/15867752/pexels-photo-15867752.png?auto=compress&cs=tinysrgb&fit=crop&h=1500&w=2200&q=86",
 };
 
-const whatsappBase = "https://wa.me/919179897839";
+const WHATSAPP_PHONE = "919179897839";
+const whatsappBase = `https://wa.me/${WHATSAPP_PHONE}`;
 const whatsappDefault = `${whatsappBase}?text=${encodeURIComponent(
-  "Hi Thakur Interior, I would like to discuss an interior design project.",
+  "Hello Thakur Interior,\n\nI came across your website and would like to discuss my interior project. Please share the details for a consultation.",
 )}`;
 const mapsDirections =
   "https://www.google.com/maps/dir/?api=1&destination=Thakur%20Interior%2C%20Garha%20%2F%20Shukla%20Nagar%2C%20Jabalpur%2C%20Madhya%20Pradesh";
@@ -155,12 +156,30 @@ const projects = [
 const projectFilters = ["All", "Living", "Kitchen", "Wardrobe", "Bedroom"];
 
 const reviewSlides = [
-  { name: "Pradeep Sharma", rating: 5 },
-  { name: "Akhilesh Kumar Khare", rating: 5 },
-  { name: "Abhishek Kumar Mittal", rating: 5 },
-  { name: "Sankalp Pandey", rating: 5 },
-  { name: "Khushiram Patel", rating: 5 },
-  { name: "Saksham Pandey", rating: 5 },
+  {
+    name: "Santosh Vishwakarma",
+    rating: 5,
+    text: "I would like to sincerely appreciate Anand c/o- Thakur Interior for the excellent interior work done in my home. The TV unit cabinet and hall partition have been...",
+    location: "Jabalpur",
+  },
+  {
+    name: "Sankalp Pandey",
+    rating: 5,
+    text: "I'm Sankalp from Adhartal, Jabalpur. I recently gave my home interior project to Thakur Interiors and they completed the entire work in just 10–15 days, exactly as promised.",
+    location: "Adhartal, Jabalpur",
+  },
+  {
+    name: "Khushiram Patel",
+    rating: 5,
+    text: "Thakur interior provide the best service I have ever seen in Jabalpur too polite behaviour and work space is very good and they also maintain the budget",
+    location: "Jabalpur",
+  },
+  {
+    name: "Saksham Pandey",
+    rating: 5,
+    text: "Such a good nature person he is, recently done my home renovation timely and cost efficiently.",
+    location: "Jabalpur",
+  },
 ];
 const reviewTrackSlides = [reviewSlides[reviewSlides.length - 1], ...reviewSlides, reviewSlides[0]];
 
@@ -326,10 +345,13 @@ function useReveal(refreshKey?: string) {
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -48px 0px" },
+      { threshold: 0.1, rootMargin: "0px 0px -20px 0px" },
     );
 
-    elements.forEach((element) => observer.observe(element));
+    elements.forEach((element) => {
+      if (element.classList.contains("is-visible")) return;
+      observer.observe(element);
+    });
     return () => observer.disconnect();
   }, [refreshKey]);
 }
@@ -369,8 +391,17 @@ function Header() {
         menuButton.current?.focus();
       }
     };
+    const handleResize = () => {
+      if (window.innerWidth > 1100) {
+        setMenuOpen(false);
+      }
+    };
     window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("resize", handleResize);
+    };
   }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
@@ -432,14 +463,14 @@ function ServiceSection() {
   return (
     <section className="section services-section" id="services" aria-labelledby="services-title">
       <div className="page-width">
-        <div className="section-heading section-heading--split reveal">
-          <div>
+        <div className="section-heading section-heading--split services-heading reveal">
+          <div className="services-heading__left">
             <p className="eyebrow">WHAT WE DO</p>
-            <h2 className="display-heading" id="services-title">
-              Space for the<br /><em>everyday.</em>
+            <h2 className="display-heading services-heading__title" id="services-title">
+              <span className="services-heading__line">Space for the</span> <em>everyday.</em>
             </h2>
           </div>
-          <p className="section-heading__aside">
+          <p className="section-heading__aside services-heading__aside">
             From a single room to a complete brief, design decisions should feel as good to live with as they look.
           </p>
         </div>
@@ -587,8 +618,9 @@ function ReviewsSection() {
       <div className="page-width">
         <div className="reviews-header reveal">
           <div>
-            <p className="eyebrow">GOOGLE REVIEWS / JABALPUR</p>
+            <p className="eyebrow">CLIENT EXPERIENCES · JABALPUR</p>
             <h2 className="display-heading" id="reviews-title">A strong reputation<br /><em>speaks for itself.</em></h2>
+            <p className="reviews-header__subtitle">Real experiences from our clients in Jabalpur.</p>
           </div>
           <div className="reviews-header__proof">
             <div className="reviews-rating" aria-label="4.9 out of 5 stars based on 208 Google reviews">
@@ -605,7 +637,7 @@ function ReviewsSection() {
         <div className="reviews-layout reveal">
           <div className="reviews-side-note">
             <span className="reviews-side-note__rule" />
-            <p>Reviewer names and five-star ratings are shown as supplied. Read each full review in its original context on Google.</p>
+            <p>Verified client experiences from homeowners and clients in Jabalpur as shared on Google.</p>
           </div>
 
           <div
@@ -683,15 +715,18 @@ function ReviewsSection() {
                           {Array.from({ length: review.rating }, (_, star) => <span aria-hidden="true" key={star}>★</span>)}
                         </span>
                       </div>
+                      <blockquote className="review-quote">
+                        "{review.text}"
+                      </blockquote>
                       <div className="review-slide__reviewer">
                         <span className="review-avatar" aria-hidden="true">{initials(review.name)}</span>
                         <div>
                           <h3>{review.name}</h3>
-                          <p>Google reviewer</p>
+                          <p>{review.location}</p>
                         </div>
                       </div>
                       <div className="review-slide__bottom">
-                        <p>See the original review on the Thakur Interior listing.</p>
+                        <p>Verified Google review for Thakur Interior.</p>
                         <a href={googleReviews} target="_blank" rel="noreferrer" tabIndex={isHidden ? -1 : undefined}>
                           View on Google <ArrowIcon diagonal />
                         </a>
@@ -723,6 +758,24 @@ function ReviewsSection() {
                   <ArrowIcon />
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="reviews-cta-block reveal">
+          <div className="reviews-cta-block__inner">
+            <div className="reviews-cta-block__text">
+              <p className="eyebrow">CONSULTATION</p>
+              <h3 className="reviews-cta-block__title">Planning your own space?</h3>
+              <p className="reviews-cta-block__desc">Let's discuss your interior requirements.</p>
+            </div>
+            <div className="reviews-cta-block__actions">
+              <a className="button button--dark" href="#contact">
+                Book a Free Consultation <ArrowIcon />
+              </a>
+              <a className="button button--whatsapp" href={whatsappDefault} target="_blank" rel="noreferrer">
+                <WhatsAppMark /> <span>Chat on WhatsApp</span>
+              </a>
             </div>
           </div>
         </div>
@@ -813,7 +866,7 @@ function ContactForm() {
     } else if (phone.replace(/\D/g, "").length < 7 || !/^[+()\d\s-]+$/.test(phone)) {
       nextErrors.phone = "Enter a valid phone number with at least 7 digits.";
     }
-    if (email && !(form.elements.namedItem("email") as HTMLInputElement).validity.valid) {
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       nextErrors.email = "Enter a valid email address, or leave this field blank.";
     }
     if (!projectType) nextErrors.projectType = "Choose the type of project you have in mind.";
@@ -833,13 +886,21 @@ function ContactForm() {
       return;
     }
 
-    const message = `Hello Thakur Interior,\n\nI would like to discuss an interior design project.\n\nPROJECT ENQUIRY\n\nName: ${fullName}\nPhone: ${phone}\nEmail: ${email || "Not provided"}\nProject Type: ${projectType}\nProject Location: ${projectLocation}\nApprox. Budget: ${budget || "Not specified"}\n\nProject Requirements:\n${requirements}\n\nI found you through your website and would like to discuss the project further.\n\nThank you.`;
+    const message = `Hello Thakur Interior,\n\nI would like to discuss an interior project.\n\nName: ${fullName}\nPhone: ${phone}${email ? `\nEmail: ${email}` : ""}\nProject Type: ${projectType}\nProject Location: ${projectLocation}\nBudget/Requirement: ${budget || "Not specified"}\nMessage: ${requirements}\n\nPlease share the next steps.`;
     const url = `${whatsappBase}?text=${encodeURIComponent(message)}`;
 
-    // Keep this synchronous with the submit gesture for mobile app handoff.
-    window.open(url, "_blank", "noopener,noreferrer");
     setWhatsappUrl(url);
-    setStatus("Opening WhatsApp with your enquiry. Review the details there and press Send to contact Thakur Interior. Your form details remain on this page.");
+    try {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.location.href = url;
+      } else {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    } catch {
+      // Handled gracefully via fallback link
+    }
+    setStatus("Opening WhatsApp with your enquiry brief. You can also tap the button below to continue directly.");
   };
 
   return (
@@ -910,34 +971,48 @@ function ContactForm() {
       {status && (
         <div className={`form-response${Object.keys(errors).length ? " form-response--error" : ""}`} role="status" aria-live="polite">
           <p>{status}</p>
-          {whatsappUrl && <a href={whatsappUrl} target="_blank" rel="noreferrer">If WhatsApp did not open, continue here <ArrowIcon diagonal /></a>}
+          {whatsappUrl && (
+            <a className="form-response__cta" href={whatsappUrl} target="_blank" rel="noreferrer">
+              <WhatsAppMark /> <span>Open WhatsApp Message</span> <ArrowIcon diagonal />
+            </a>
+          )}
         </div>
       )}
     </form>
   );
 }
 
+function FloatingWhatsApp() {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    try {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.location.href = whatsappDefault;
+        e.preventDefault();
+      }
+    } catch {
+      // Allow default link navigation
+    }
+  };
+
+  return (
+    <a
+      className="floating-whatsapp"
+      href={whatsappDefault}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Chat with Thakur Interior on WhatsApp"
+      onClick={handleClick}
+    >
+      <WhatsAppMark />
+      <span>Chat on WhatsApp</span>
+    </a>
+  );
+}
+
 export default function App() {
   const [activeFilter, setActiveFilter] = useState("All");
-  const [floatingVisible, setFloatingVisible] = useState(true);
   useReveal(activeFilter);
-
-  useEffect(() => {
-    const reviews = document.getElementById("reviews");
-    const contact = document.getElementById("contact");
-    const footer = document.querySelector(".site-footer");
-    if (!reviews || !contact || !footer || !("IntersectionObserver" in window)) return;
-
-    const visibility = new Map<Element, boolean>([[reviews, false], [contact, false], [footer, false]]);
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => visibility.set(entry.target, entry.isIntersecting));
-      setFloatingVisible(!Array.from(visibility.values()).some(Boolean));
-    }, { threshold: 0.04 });
-    observer.observe(reviews);
-    observer.observe(contact);
-    observer.observe(footer);
-    return () => observer.disconnect();
-  }, []);
 
   const visibleProjects = projects.filter((project) => activeFilter === "All" || project.category === activeFilter);
 
@@ -959,18 +1034,18 @@ export default function App() {
           />
           <div className="hero__shade" />
           <div className="hero__content page-width">
-            <p className="hero__eyebrow hero-reveal hero-reveal--one">INTERIOR DESIGN / JABALPUR</p>
+            <p className="hero__eyebrow hero-reveal hero-reveal--one">INTERIOR DESIGN · HOME INTERIOR SERVICES · JABALPUR</p>
             <h1 className="hero__title hero-reveal hero-reveal--two" id="hero-title">
               <span>THAKUR</span>
               <span className="hero__title-second">INTERIOR</span>
             </h1>
-            <p className="hero__intro hero-reveal hero-reveal--three">Thoughtful interiors, designed around the way you live.</p>
+            <p className="hero__intro hero-reveal hero-reveal--three">Thoughtful residential and commercial interiors, designed around the way you live in Jabalpur, Madhya Pradesh.</p>
             <div className="hero__actions hero-reveal hero-reveal--four">
-              <a className="button button--light" href="#projects">
-                Explore the projects <ArrowIcon />
+              <a className="button button--light" href="#contact">
+                Book a Free Consultation <ArrowIcon />
               </a>
               <a className="hero__whatsapp" href={whatsappDefault} target="_blank" rel="noreferrer">
-                Start your project <ArrowIcon diagonal />
+                Start on WhatsApp <ArrowIcon diagonal />
               </a>
             </div>
           </div>
@@ -1149,6 +1224,9 @@ export default function App() {
                   <div className="contact-detail contact-detail--location">
                     <span>LOCATION</span><strong>Garha / Shukla Nagar<br />Jabalpur, Madhya Pradesh</strong>
                   </div>
+                  <div className="contact-detail contact-detail--hours">
+                    <span>CONSULTATION HOURS</span><strong>Mon – Sat: 10:00 AM – 7:30 PM<br />Sunday: By Appointment</strong>
+                  </div>
                 </div>
                 <div className="map-block">
                   <div className="map-block__heading">
@@ -1198,10 +1276,7 @@ export default function App() {
         </div>
       </footer>
 
-      <a className={`floating-whatsapp${floatingVisible ? "" : " is-hidden"}`} href={whatsappDefault} target="_blank" rel="noreferrer" aria-label="Chat with Thakur Interior on WhatsApp" aria-hidden={!floatingVisible} tabIndex={floatingVisible ? 0 : -1}>
-        <WhatsAppMark />
-        <span>Chat on WhatsApp</span>
-      </a>
+      <FloatingWhatsApp />
     </div>
   );
 }
